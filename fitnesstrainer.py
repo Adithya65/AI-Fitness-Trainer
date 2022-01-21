@@ -1,5 +1,6 @@
 from tkinter.constants import COMMAND
 import cv2 as cv
+from tkinter import *
 import pywhatkit as kit
 import mediapipe as mp
 import tkinter as tk
@@ -237,14 +238,46 @@ def playvid():
     B.pack()
     
 top = tk.Tk()
-top.geometry("200x100")  
-m=tk.Button(top,text="left Arm",command=leftarm)
-B = tk.Button(top, text ="Right Arm", command = rightarm)
-n=tk.Button(top,text="pushup",command=pushup)
-z=tk.Button(top,text="vid",command=playvid)
-m.pack()
-n.pack()
-z.pack()
-
-B.pack()
+top.geometry("2300x2300")  
+bg = PhotoImage(file = "9.png")
+ 
+ 
+canvas1 = Canvas( top, width = 400,
+                 height = 400)
+  
+canvas1.pack(fill = "both", expand = True)
+  
+# Display image
+canvas1.create_image(700, 0 , image = bg, 
+                     anchor = "nw")
+ 
+m=tk.Button(top,text="left Arm",command=leftarm,width=30,activebackground="#0AEBD0" , bg="#2FC381" )
+B = tk.Button(top, text ="Right Arm", command = rightarm,width=30,activebackground="#0AEBD0" , bg="#2FC381")
+n=tk.Button(top,text="pushup",command=pushup,width=30,activebackground="#0AEBD0" , bg="#2FC381")
+z=tk.Button(top,text="Songs",command=playvid,width=30,activebackground="#0AEBD0" , bg="#2FC381")
+l=tk.Button(top,text="Pullup",command=playvid,width=30,activebackground="#0AEBD0" , bg="#2FC381")
+r=tk.Button(top,text="Generate Report",command=playvid,width=30,activebackground="#0AEBD0" , bg="#2FC381")
+button1_canvas = canvas1.create_window( 160, 150, 
+                                       anchor = "nw",
+                                       window = m)
+button4_canvas = canvas1.create_window( 160, 200, 
+                                       anchor = "nw",
+                                       window = B)
+  
+button2_canvas = canvas1.create_window( 160, 250,
+                                       anchor = "nw",
+                                       window =n )
+button3_canvas = canvas1.create_window( 160, 300,
+                                       anchor = "nw",
+                                       window =z )
+button5_canvas = canvas1.create_window( 160, 350,
+                                       anchor = "nw",
+                                       window =l )
+button6_canvas = canvas1.create_window( 160, 400,
+                                       anchor = "nw",
+                                       window =r )
+  
+  
+  
+ 
 top.mainloop()
