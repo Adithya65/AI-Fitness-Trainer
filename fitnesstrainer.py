@@ -1,11 +1,19 @@
 from tkinter.constants import COMMAND
 import cv2 as cv
+from datetime import date
+from datetime import datetime
+
+
 from tkinter import *
 import pywhatkit as kit
+from fpdf import FPDF
 import mediapipe as mp
 import tkinter as tk
 import math
+import time
 import numpy as np
+today = date.today()
+now = datetime.now()
 mpdraw=mp.solutions.drawing_utils
 mpPose=mp.solutions.pose
 pose=mpPose.Pose()
@@ -90,6 +98,29 @@ def rightarm():
             break
     cv.destroyAllWindows()
     cap.release()
+    pdf = FPDF()
+  
+# Add a page
+    pdf.add_page()
+    
+    # set style and size of font 
+    # that you want in the pdf
+    pdf.set_font("Arial", size = 15)
+    
+    pdf.cell(0,5, txt = str(today), 
+            ln = 1, align = 'C')
+    pdf.cell(0,5, txt = str(now), 
+            ln = 1, align = 'C')
+    # create a cell
+    pdf.cell(200, 10, txt = str(count), 
+            ln = 1, align = 'C')
+    
+    # add another cell
+    pdf.cell(200, 10, txt = "A Computer Science portal for geeks.",
+            ln = 2, align = 'C')
+    
+    # save the pdf with name .pdf
+    pdf.output("Go.pdf")   
 def leftarm():
     count=0
     dir=0
