@@ -1,4 +1,4 @@
 # AI-gymtrainer
 
 ### UI
-![](UI.PNG)
+![](UI.png)
