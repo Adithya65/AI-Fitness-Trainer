@@ -17,6 +17,10 @@ now = datetime.now()
 mpdraw=mp.solutions.drawing_utils
 mpPose=mp.solutions.pose
 pose=mpPose.Pose()
+pdf = FPDF()
+i=0 
+# Add a page
+pdf.add_page()
 def rightarm():
     count=0
     dir=0
@@ -26,6 +30,7 @@ def rightarm():
     cy2=0
     cx1=0
     cy1=0
+    count1=0
     
 
     cap=cv.VideoCapture(0)
@@ -73,18 +78,18 @@ def rightarm():
                 
                 inter=np.interp(angle,(170,40),(0,100)) 
                 bar=np.interp(angle,(170,40),(650,100))
-                print(count)  
+                print(count1)  
                 if inter==100:
                     if dir==0:
-                        count=count+0.5
+                        count=count1+0.5
                         dir=1
                 if inter==0:
                     if dir==1:
-                        count=count+0.5
+                        count=count1+0.5
                         dir=0
                 
                 cv.rectangle(frame,(500,300),(635,450),(153,102,180),cv.FILLED)      
-                cv.putText(frame,str(int(count)),(550,430),cv.FONT_HERSHEY_SIMPLEX,3,(0,255,0),5)
+                cv.putText(frame,str(int(count1)),(550,430),cv.FONT_HERSHEY_SIMPLEX,3,(0,255,0),5)
                 cv.line(frame,(cx2,cy2),(cx1,cy1),(255,255,255),3)
                 cv.line(frame,(cx3,cy3),(cx2,cy2),(255,255,255),3)
                 cv.putText(frame, str(int(angle)), ( 50,   50),
@@ -98,29 +103,38 @@ def rightarm():
             break
     cv.destroyAllWindows()
     cap.release()
-    pdf = FPDF()
-  
-# Add a page
-    pdf.add_page()
+    generate(count1,'righthand',10)
+def generate(par,type,poso):
+     
     
     # set style and size of font 
     # that you want in the pdf
-    pdf.set_font("Arial", size = 15)
+    pdf.set_font("Arial", size = 6)
     
-    pdf.cell(0,5, txt = str(today), 
-            ln = 1, align = 'C')
-    pdf.cell(0,5, txt = str(now), 
-            ln = 1, align = 'C')
+    """pdf.cell(0,5, txt = str(today), 
+            ln = 1, align = 'L')"""
+    txt = str(now)
+     
+ 
+    pdf.cell(0,5,'Date: '+ txt[0:10],
+            ln = 1, align = 'L')
+    pdf.cell(0,5,'Time: '+ txt[10:16],
+            ln = 1, align = 'L')
     # create a cell
-    pdf.cell(200, 10, txt = str(count), 
+    pdf.cell(200, poso, txt =str(type)+ str(par), 
             ln = 1, align = 'C')
-    
+    pdf.set_font("Arial", size = 16)
     # add another cell
-    pdf.cell(200, 10, txt = "A Computer Science portal for geeks.",
-            ln = 2, align = 'C')
-    
+    """pdf.cell(200, 10, txt = ,
+            ln = 2, align = 'L')"""
+   
+     
     # save the pdf with name .pdf
-    pdf.output("Go.pdf")   
+    
+    
+def output_pdf():
+    pdf.output("Go.pdf") 
+      
 def leftarm():
     count=0
     dir=0
@@ -202,6 +216,7 @@ def leftarm():
             break
     cv.destroyAllWindows()
     cap.release()
+    generate(count,'leftarm',20)
 def pushup():
     mp_drawing = mp.solutions.drawing_utils
     mpPose = mp.solutions.pose
@@ -250,7 +265,9 @@ def pushup():
             cv.imshow('MediaPipe Pose', image)
             if cv.waitKey(1)==27: 
                 break
-            
+        cv.destroyAllWindows()
+        cap.release()
+        generate(counter,'pushup',30)
 def playvid():
     def vid( ):
          
@@ -287,7 +304,7 @@ B = tk.Button(top, text ="Right Arm", command = rightarm,width=30,activebackgrou
 n=tk.Button(top,text="pushup",command=pushup,width=30,activebackground="#0AEBD0" , bg="#2FC381")
 z=tk.Button(top,text="Songs",command=playvid,width=30,activebackground="#0AEBD0" , bg="#2FC381")
 l=tk.Button(top,text="Pullup",command=playvid,width=30,activebackground="#0AEBD0" , bg="#2FC381")
-r=tk.Button(top,text="Generate Report",command=playvid,width=30,activebackground="#0AEBD0" , bg="#2FC381")
+r=tk.Button(top,text="Generate Report",command=output_pdf,width=30,activebackground="#0AEBD0" , bg="#2FC381")
 button1_canvas = canvas1.create_window( 160, 150, 
                                        anchor = "nw",
                                        window = m)
@@ -309,6 +326,6 @@ button6_canvas = canvas1.create_window( 160, 400,
                                        window =r )
   
   
-  
+i=0
  
 top.mainloop()
