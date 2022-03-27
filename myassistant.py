@@ -1,15 +1,52 @@
 from tkinter.constants import COMMAND
 import cv2 as cv
+from datetime import date
+from datetime import datetime
+import numpy
+import pandas
+from matplotlib import pyplot as plt
+
+from tkinter import *
 import pywhatkit as kit
+from fpdf import FPDF
+from PIL import Image
 import mediapipe as mp
 import tkinter as tk
 import math
+import time
 import numpy as np
+today = date.today()
+now = datetime.now()
 mpdraw=mp.solutions.drawing_utils
 mpPose=mp.solutions.pose
 pose=mpPose.Pose()
+pdf = FPDF()
+i=0 
+# Add a page
+pdf.add_page()
+img =Image.new('RGB', (210,297), "#afeafe" )
+img.save('blue_colored.png')
+pdf.set_font('arial',size= 7)
+
+
+# adding image to pdf page that e created using fpdf
+#pdf.image('blue_colored.png', x = 0, y = 0, w = 210, h = 297, type = '', link = '')
+    
+"""pdf.cell(0,5, txt = str(today), 
+            ln = 1, align = 'L')"""
+txt = str(now)
+exe=list()
+number=list() 
+pdf.cell(0,5,'Date: '+ txt[0:10],
+            ln = 1, align = 'L')
+pdf.cell(0,5,'Time: '+ txt[10:16],
+            ln = 1, align = 'L')
+pdf.cell(60)
+
+pdf.set_font('arial', 'B', 20)
+pdf.cell(75, 10, 'Fitness Assistant', 0, 2, 'C')     
 def rightarm():
-    count=0
+    
     dir=0
     cx3=0
     cy3=0
@@ -17,6 +54,7 @@ def rightarm():
     cy2=0
     cx1=0
     cy1=0
+    count1=0
     
 
     cap=cv.VideoCapture(0)
@@ -64,18 +102,18 @@ def rightarm():
                 
                 inter=np.interp(angle,(170,40),(0,100)) 
                 bar=np.interp(angle,(170,40),(650,100))
-                print(count)  
+                print(count1)  
                 if inter==100:
                     if dir==0:
-                        count=count+0.5
+                        count1=count1+0.5
                         dir=1
                 if inter==0:
                     if dir==1:
-                        count=count+0.5
+                        count1=count1+0.5
                         dir=0
                 
                 cv.rectangle(frame,(500,300),(635,450),(153,102,180),cv.FILLED)      
-                cv.putText(frame,str(int(count)),(550,430),cv.FONT_HERSHEY_SIMPLEX,3,(0,255,0),5)
+                cv.putText(frame,str(int(count1)),(550,430),cv.FONT_HERSHEY_SIMPLEX,3,(0,255,0),5)
                 cv.line(frame,(cx2,cy2),(cx1,cy1),(255,255,255),3)
                 cv.line(frame,(cx3,cy3),(cx2,cy2),(255,255,255),3)
                 cv.putText(frame, str(int(angle)), ( 50,   50),
@@ -89,6 +127,48 @@ def rightarm():
             break
     cv.destroyAllWindows()
     cap.release()
+    generate(count1,'Right Arm:---',10)
+def generate(par,type,poso):
+     
+    
+    # set style and size of font 
+    # that you want in the pdf
+    
+    # create a cell
+    pdf.cell(10,poso, txt ="", 
+            ln = 1, align = 'L')
+    
+    pdf.set_font('arial', 'B', 10)
+    pdf.set_fill_color(248,245,235)
+    pdf.set_text_color(255,0,0)
+    exe.append(type)
+    number.append(par)
+    pdf.cell(40,poso, txt =str(type)+ str(int(par)), 
+            ln = 1, align = 'L')
+    # add another cell
+    """pdf.cell(200, 10, txt = ,
+            ln = 2, align = 'L')"""
+   
+     
+     
+    
+    
+def output_pdf():
+    fig = plt.figure(figsize = (2, 3))
+    fig.set_size_inches(5, 5)
+
+# creating the bar plot
+    plt.bar(exe, number, color ='maroon',
+		width = 0.1)
+
+    plt.xlabel("Type")
+    plt.ylabel("Count")
+    plt.title("Analytics")
+    plt.savefig('fig.png')
+    pdf.cell(180,50, '', 0, 2 )
+    pdf.image('fig.png', x = None, y = None, w=0, h=0, type='', link='')
+    pdf.output("Go.pdf") 
+      
 def leftarm():
     count=0
     dir=0
@@ -170,6 +250,7 @@ def leftarm():
             break
     cv.destroyAllWindows()
     cap.release()
+    generate(count,'Left Arm :---',13)
 def pushup():
     mp_drawing = mp.solutions.drawing_utils
     mpPose = mp.solutions.pose
@@ -218,18 +299,20 @@ def pushup():
             cv.imshow('MediaPipe Pose', image)
             if cv.waitKey(1)==27: 
                 break
-            
+        cv.destroyAllWindows()
+        cap.release()
+        generate(counter,'Pushup:---',14)
 def playvid():
-    def vid(x):
-        print(x)
-        kit.playonyt(x)
+    def vid( ):
+         
+        kit.playonyt(str(entry.get()))
         
      
     window=tk.Tk()
     window.geometry("200x100")
     entry= tk.Entry(window, width= 40)
-    w=entry.get()
-    B = tk.Button(window, text ="play video", command=lambda:vid(w))
+     
+    B = tk.Button(window, text ="play video", command=vid)
     
      
     entry.pack()
@@ -237,14 +320,46 @@ def playvid():
     B.pack()
     
 top = tk.Tk()
-top.geometry("200x100")  
-m=tk.Button(top,text="left Arm",command=leftarm)
-B = tk.Button(top, text ="Right Arm", command = rightarm)
-n=tk.Button(top,text="pushup",command=pushup)
-z=tk.Button(top,text="vid",command=playvid)
-m.pack()
-n.pack()
-z.pack()
-
-B.pack()
+top.geometry("2300x2300")  
+bg = PhotoImage(file = "9.png")
+ 
+ 
+canvas1 = Canvas( top, width = 400,
+                 height = 400)
+  
+canvas1.pack(fill = "both", expand = True)
+  
+# Display image
+canvas1.create_image(700, 0 , image = bg, 
+                     anchor = "nw")
+ 
+m=tk.Button(top,text="left Arm",command=leftarm,width=30,activebackground="#0AEBD0" , bg="#2FC381" )
+B = tk.Button(top, text ="Right Arm", command = rightarm,width=30,activebackground="#0AEBD0" , bg="#2FC381")
+n=tk.Button(top,text="pushup",command=pushup,width=30,activebackground="#0AEBD0" , bg="#2FC381")
+z=tk.Button(top,text="Songs",command=playvid,width=30,activebackground="#0AEBD0" , bg="#2FC381")
+l=tk.Button(top,text="Pullup",command=playvid,width=30,activebackground="#0AEBD0" , bg="#2FC381")
+r=tk.Button(top,text="Generate Report",command=output_pdf,width=30,activebackground="#0AEBD0" , bg="#2FC381")
+button1_canvas = canvas1.create_window( 160, 150, 
+                                       anchor = "nw",
+                                       window = m)
+button4_canvas = canvas1.create_window( 160, 200, 
+                                       anchor = "nw",
+                                       window = B)
+  
+button2_canvas = canvas1.create_window( 160, 250,
+                                       anchor = "nw",
+                                       window =n )
+button3_canvas = canvas1.create_window( 160, 300,
+                                       anchor = "nw",
+                                       window =z )
+button5_canvas = canvas1.create_window( 160, 350,
+                                       anchor = "nw",
+                                       window =l )
+button6_canvas = canvas1.create_window( 160, 400,
+                                       anchor = "nw",
+                                       window =r )
+  
+  
+i=0
+ 
 top.mainloop()
